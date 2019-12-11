@@ -12,7 +12,6 @@ int main(int argc, char* argv[]) {
 
 	int electing = 1;
 	int msg = -1;
-	int lastmsg = -1;
 	int nummsg = 0;
 
 	MPI_Send(&rank, 1, MPI_INT, (rank + 1) % size, 0, MPI_COMM_WORLD);
@@ -32,19 +31,15 @@ int main(int argc, char* argv[]) {
 	
 		if (msg == rank) {
 			printf("Process rank %d >> I am the leader\n", rank);
-			lastmsg = rank;
+			electing = 0;
 		}
 		else if (msg > rank) {
-			lastmsg = msg;
 			MPI_Send(&msg, 1, MPI_INT, (rank + 1) % size, 0, MPI_COMM_WORLD);
+			printf("Process rank %d >> Election finished\n", rank);
+			electing = 0;
 		}
 		else {
-			lastmsg = rank;
-		}
-
-		if (lastmsg == msg) {
-			electing = 0;
-			printf("Process rank %d >> Election finished\n", rank);
+			//do nothing
 		}
 	}
 	
